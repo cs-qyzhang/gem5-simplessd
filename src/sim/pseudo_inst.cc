@@ -56,6 +56,7 @@
 #include "cpu/base.hh"
 #include "cpu/thread_context.hh"
 #include "debug/Loader.hh"
+#include "debug/M5Print.hh"
 #include "debug/Quiesce.hh"
 #include "debug/WorkItems.hh"
 #include "dev/net/dist_iface.hh"
@@ -602,6 +603,41 @@ workend(ThreadContext *tc, uint64_t workid, uint64_t threadid)
             exitSimLoop("work items exit count reached");
         }
     }
+}
+
+uint64_t
+m5GetTick(ThreadContext *tc, Addr t) {
+    struct timespec real;
+
+    uint64_t tick = curTick();
+    real.tv_nsec = (tick / 1000) % 1000000000;
+    real.tv_sec = (tick / 1000) / 1000000000;
+
+    TranslatingPortProxy fs_proxy(tc);
+    SETranslatingPortProxy se_proxy(tc);
+    PortProxy &virt_proxy = FullSystem ? fs_proxy : se_proxy;
+
+    if (t) {
+        virt_proxy.writeBlob(t, &real, sizeof(struct timespec));
+    }
+
+    return tick;
+}
+
+void
+m5Print(ThreadContext *tc, Addr str, uint64_t len) {
+    char *buf = (char *)calloc(len + 1, 1);
+
+    TranslatingPortProxy fs_proxy(tc);
+    SETranslatingPortProxy se_proxy(tc);
+    PortProxy &virt_proxy = FullSystem ? fs_proxy : se_proxy;
+
+    if (str) {
+        virt_proxy.readBlob(str, buf, len);
+        DPRINTF(M5Print, "Log from guest: %s\n", buf);
+    }
+
+    free(buf);
 }
 
 } // namespace pseudo_inst

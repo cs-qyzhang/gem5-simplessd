@@ -40,14 +40,22 @@
 
 Import('*')
 
+env.Append(CPPPATH=Dir('./simplessd'))
+
 # Controllers
 SimObject('Ide.py', sim_objects=['IdeDisk', 'IdeController'], enums=['IdeID'])
+SimObject('NVMe.py', sim_objects=['NVMeInterface'])
+# SimObject('SATA.py', sim_objects=['SATAInterface'])
 
 Source('ide_ctrl.cc')
 Source('ide_disk.cc')
 
 DebugFlag('IdeCtrl')
 DebugFlag('IdeDisk')
+
+Source('def.cc')
+Source('nvme_interface.cc')
+# Source('sata_interface.cc')
 
 # Disk models
 SimObject('DiskImage.py', sim_objects=[

@@ -140,5 +140,6 @@ DebugFlag('VoltageDomain')
 DebugFlag('DVFS')
 DebugFlag('Vma')
 DebugFlag('PowerDomain')
+DebugFlag('M5Print')
 
 CompoundFlag('SyscallAll', [ 'SyscallBase', 'SyscallVerbose'])

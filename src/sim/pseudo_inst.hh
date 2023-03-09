@@ -96,6 +96,9 @@ void m5Syscall(ThreadContext *tc);
 void togglesync(ThreadContext *tc);
 void triggerWorkloadEvent(ThreadContext *tc);
 
+uint64_t m5GetTick(ThreadContext *tc, Addr t);
+void m5Print(ThreadContext *tc, Addr str, uint64_t len);
+
 /**
  * Execute a decoded M5 pseudo instruction
  *
@@ -214,9 +217,15 @@ pseudoInstWork(ThreadContext *tc, uint8_t func, uint64_t &result)
         invokeSimcall<ABI>(tc, workend);
         return true;
 
+      case M5OP_GET_TICK:
+        result = invokeSimcall<ABI, store_ret>(tc, m5GetTick);
+        return true;
+
+      case M5OP_PRINT:
+        invokeSimcall<ABI>(tc, m5Print);
+        return true;
+
       case M5OP_RESERVED1:
-      case M5OP_RESERVED2:
-      case M5OP_RESERVED3:
       case M5OP_RESERVED4:
       case M5OP_RESERVED5:
         warn("Unimplemented m5 op (%#x)\n", func);

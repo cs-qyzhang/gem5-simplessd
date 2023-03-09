@@ -145,6 +145,8 @@ AddOption('--gprof', action='store_true',
           help='Enable support for the gprof profiler')
 AddOption('--pprof', action='store_true',
           help='Enable support for the pprof profiler')
+AddOption('--debug-simplessd', action='store_true',
+          help='Build SimpleSSD in debug mode')
 
 # Inject the built_tools directory into the python path.
 sys.path[1:1] = [ Dir('#build_tools').abspath ]
@@ -290,6 +292,8 @@ main['CLANG'] = CXX_version and CXX_version.find('clang') >= 0
 if main['GCC'] + main['CLANG'] > 1:
     error('Two compilers enabled at once?')
 
+main.Append(LINKFLAGS=['-L/home/qyzhang/gem5/build/simplessd'])
+main.Append(LIBS=['simplessd', 'mcpat'])
 
 ########################################################################
 #
